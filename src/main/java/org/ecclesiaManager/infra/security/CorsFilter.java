@@ -17,7 +17,7 @@ public class CorsFilter implements ContainerRequestFilter, ContainerResponseFilt
 
     private static final List<String> ORIGENS_PERMITIDAS = List.of(
             "http://localhost:5173", // O seu React rodando localmente
-            "https://ecclesia-manager-ten.vercel.app/" // Exemplo: A URL de produção do seu React no futuro
+            "https://ecclesia-manager-ten.vercel.app" // Exemplo: A URL de produção do seu React no futuro
     );
 
     private String getOrigemPermitida(String originRecebida) {
