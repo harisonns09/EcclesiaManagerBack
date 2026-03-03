@@ -1,0 +1,25 @@
+steps:
+  # 1. Faz o Build da imagem usando o nosso Dockerfile
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', 'gcr.io/$PROJECT_ID/ecclesia-backend:$COMMIT_SHA', '.']
+
+  # 2. Envia (Push) a imagem para o Container Registry do Google
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'gcr.io/$PROJECT_ID/ecclesia-backend:$COMMIT_SHA']
+
+  # 3. Faz o Deploy automático no Cloud Run
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args:
+      - 'run'
+      - 'deploy'
+      - 'ecclesia-backend'
+      - '--image'
+      - 'gcr.io/$PROJECT_ID/ecclesia-backend:$COMMIT_SHA'
+      - '--region'
+      - 'us-central1' # Se quiser os servidores no Brasil, troque para 'sa-east1'
+      - '--allow-unauthenticated'
+
+# AQUI ESTÁ A CORREÇÃO EXATA DO SEU ERRO:
+options:
+  logging: CLOUD_LOGGING_ONLY
