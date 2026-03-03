@@ -1,5 +1,6 @@
-*
-!target/*-runner
-!target/*-runner.jar
-!target/lib/*
-!target/quarkus-app/*
+# Ignorar as pastas de compilação e configurações locais
+target/
+.git/
+.idea/
+.vscode/
+*.iml
