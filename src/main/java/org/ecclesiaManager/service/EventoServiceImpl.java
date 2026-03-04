@@ -38,7 +38,15 @@ public class EventoServiceImpl implements IEventoService {
     @Inject
     IgrejaRepository igrejaRepository;
 
+    private String cleanDigits(String value) {
+        if (value == null || value.isBlank()) {
+            return null;
+        }
+        return value.replaceAll("[^0-9]", "");
+    }
+
     @Override
+    @Transactional
     public List<EventoResponseDTO> findByIgrejaId(Long idIgreja) {
         return eventoRepository.findByIgrejaId(idIgreja).stream()
                 .map(EventoResponseDTO::new)
@@ -46,9 +54,9 @@ public class EventoServiceImpl implements IEventoService {
     }
 
     @Override
-    public Optional<EventoResponseDTO> findById(Long idIgreja, Long eventoId) {
+    @Transactional
+    public Optional<EventoResponseDTO> findById(Long eventoId) {
         return eventoRepository.findByIdOptional(eventoId)
-                .filter(evento -> evento.getIgreja().getId().equals(idIgreja))
                 .map(EventoResponseDTO::new);
     }
 
@@ -105,12 +113,17 @@ public class EventoServiceImpl implements IEventoService {
         Evento evento = eventoRepository.findByIdOptional(eventoId)
                 .orElseThrow(()-> new WebApplicationException("Evento não encontrado", Response.Status.NOT_FOUND));
 
-        if (inscricaoRepository.existsByCpfAndEventoId(dto.cpf(), eventoId)) {
-            log.warn("Tentativa de inscrição duplicada bloqueada. CPF: ***.***.{}-** | Evento: {}", dto.cpf().substring(9), eventoId);
+        String cpfLimpo = cleanDigits(dto.cpf());
+        String telefoneLimpo = cleanDigits(dto.telefone());
+
+        if (inscricaoRepository.existsByCpfAndEventoId(cpfLimpo, eventoId)) {
+            log.warn("Tentativa de inscrição duplicada bloqueada. CPF: {} | Evento: {}", cpfLimpo, eventoId);
             throw new WebApplicationException("Este CPF já possui uma inscrição confirmada ou pendente para este evento.", Response.Status.CONFLICT);
         }
 
         Inscricao newInscricao = new Inscricao(dto, evento);
+        newInscricao.setCpf(cpfLimpo);
+        newInscricao.setTelefone(telefoneLimpo);
         inscricaoRepository.persist(newInscricao);
 
         String dataHoje = newInscricao.getDataInscricao().format(DateTimeFormatter.ofPattern("yyyyMMdd"));

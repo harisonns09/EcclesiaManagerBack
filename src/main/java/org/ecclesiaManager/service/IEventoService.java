@@ -14,7 +14,7 @@ public interface IEventoService {
 
     List<EventoResponseDTO> findByIgrejaId(Long idIgreja);
 
-    Optional<EventoResponseDTO> findById(Long idIgreja, Long eventoId);
+    Optional<EventoResponseDTO> findById(Long eventoId);
 
     EventoResponseDTO addEvento(Long idIgreja, EventoRequestDTO dto);
 

@@ -13,7 +13,7 @@ import jakarta.ws.rs.core.Response;
 
 import java.util.List;
 
-@Path("/api")
+@Path("/api/ministerios")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class MinisterioController {
@@ -22,13 +22,13 @@ public class MinisterioController {
     IMinisterioService ministerioService;
 
     @GET
-    @Path("/igrejas/{igrejaId}/ministerios")
+    @Path("/igrejas/{igrejaId}")
     public List<MinisterioResponseDTO> getMinisterios(@PathParam("igrejaId") Long igrejaId) {
         return ministerioService.findAllByIgreja(igrejaId);
     }
 
     @GET
-    @Path("/igrejas/{igrejaId}/ministerios/{id}")
+    @Path("/igrejas/{igrejaId}/{id}")
     @Loggable(action = "CONSULTAR", entity = "MINISTERIO")
     public Response carregarMinisterio(@PathParam("id") Long id) {
         return ministerioService.findById(id)
@@ -37,7 +37,7 @@ public class MinisterioController {
     }
 
     @POST
-    @Path("/igrejas/{igrejaId}/ministerios")
+    @Path("/igrejas/{igrejaId}")
     public Response addMinisterio(@PathParam("igrejaId") Long igrejaId, @Valid MinisterioRequestDTO ministerio) {
         try {
             return Response.ok(ministerioService.addMinisterio(igrejaId, ministerio)).build();
@@ -47,14 +47,14 @@ public class MinisterioController {
     }
 
     @DELETE
-    @Path("/igrejas/{igrejaId}/ministerios/{id}")
+    @Path("/igrejas/{igrejaId}/{id}")
     public Response deleteMinisterio(@PathParam("igrejaId") Long igrejaId, @PathParam("id") Long id) {
         ministerioService.deleteById(igrejaId, id);
         return Response.ok().build();
     }
 
     @PUT
-    @Path("/igrejas/{igrejaId}/ministerios/{id}")
+    @Path("/igrejas/{igrejaId}/{id}")
     public Response updateMinisterio(@PathParam("igrejaId") Long igrejaId, @PathParam("id") Long id, MinisterioRequestDTO dto) {
         return Response.ok(ministerioService.updateMinisterio(igrejaId, id, dto)).build();
     }

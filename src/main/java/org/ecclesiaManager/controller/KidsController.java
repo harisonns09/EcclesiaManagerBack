@@ -11,7 +11,7 @@ import org.ecclesiaManager.service.ICheckInKidsService;
 
 import java.util.List;
 
-@Path("/api/igrejas/{igrejaId}/kids")
+@Path("/api/kids")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 @RolesAllowed({"ADMIN", "KIDS"})
@@ -21,19 +21,19 @@ public class KidsController {
     ICheckInKidsService checkInKidsService;
 
     @POST
-    @Path("/checkin")
+    @Path("/{igrejaId}/checkin")
     public Response checkin(@PathParam("igrejaId") Long igrejaId, CheckInKidsRequestDTO dto) {
         return Response.ok(checkInKidsService.realizarCheckIn(igrejaId, dto)).build();
     }
 
     @GET
-    @Path("/ativos")
+    @Path("/{igrejaId}/ativos")
     public Response listarAtivos(@PathParam("igrejaId") Long igrejaId) {
         return Response.ok(checkInKidsService.listarAtivos(igrejaId)).build();
     }
 
     @POST
-    @Path("/checkout/{checkInId}")
+    @Path("/{igrejaId}/checkout/{checkInId}")
     public Response checkout(@PathParam("checkInId") Long checkInId) {
         checkInKidsService.realizarCheckOut(checkInId);
         return Response.ok().build();

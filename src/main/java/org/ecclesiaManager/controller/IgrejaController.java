@@ -1,5 +1,6 @@
 package org.ecclesiaManager.controller;
 
+import jakarta.annotation.security.PermitAll;
 import org.ecclesiaManager.model.dto.IgrejaRequestDTO;
 import org.ecclesiaManager.model.dto.IgrejaResponseDTO;
 import org.ecclesiaManager.service.IIgrejaService;
@@ -10,7 +11,7 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import java.util.List;
 
-@Path("/api")
+@Path("/api/igrejas")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class IgrejaController {
@@ -19,13 +20,14 @@ public class IgrejaController {
     IIgrejaService igrejaService;
 
     @GET
-    @Path("/igrejas")
+
+    @PermitAll
     public List<IgrejaResponseDTO> findAll() {
         return igrejaService.findAll();
     }
 
     @GET
-    @Path("/igreja/{id}")
+    @Path("/{id}")
     public Response findById(@PathParam("id") Long id) {
         return igrejaService.findById(id)
                 .map(igreja -> Response.ok(igreja).build())
@@ -52,7 +54,7 @@ public class IgrejaController {
     }
 
     @GET
-    @Path("/public/igrejas/{id}")
+    @Path("/publico/{id}")
     public Response findPublicById(@PathParam("id") Long id) {
         return igrejaService.findById(id)
                 .map(igreja -> Response.ok(igreja).build())

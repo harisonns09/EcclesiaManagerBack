@@ -9,7 +9,7 @@ import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
-@Path("/api")
+@Path("/api/checkout")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class CheckoutController {
@@ -21,7 +21,7 @@ public class CheckoutController {
     IEventoService eventoService;
 
     @POST
-    @Path("/eventos/{eventId}/checkout")
+    @Path("/publico/eventos/{eventId}")
     public Response createCheckout(
             @PathParam("eventId") String eventId,
             CheckoutRequestDTO data

@@ -15,7 +15,7 @@ import org.ecclesiaManager.service.IUsuarioService;
 import java.util.Arrays;
 import java.util.List;
 
-@Path("/api/igrejas/{igrejaId}/usuarios")
+@Path("/api/usuarios")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 @RolesAllowed("ADMIN")
@@ -34,11 +34,13 @@ public class UsuarioController {
     }
 
     @GET
+    @Path("/{igrejaId}")
     public List<UsuarioResponseDTO> listarUsuarios(@PathParam("igrejaId") Long igrejaId) {
         return usuarioService.listarUsuarios(igrejaId);
     }
 
     @POST
+    @Path("/{igrejaId}")
     public Response register(@PathParam("igrejaId") Long igrejaId, @Valid UsuarioRequestDTO data) {
         // Criando um novo DTO para garantir que o igrejaId do path seja usado
         UsuarioRequestDTO request = new UsuarioRequestDTO(data.id(), data.user(), data.password(), data.role(), igrejaId);
@@ -46,14 +48,14 @@ public class UsuarioController {
     }
 
     @PUT
-    @Path("/{userId}")
+    @Path("/{igrejaId}/{userId}")
     public Response alterarUsuario(@PathParam("igrejaId") Long igrejaId, @PathParam("userId") Long userId, @Valid UsuarioRequestDTO data) {
         UsuarioResponseDTO response = usuarioService.alterarUsuario(igrejaId, userId, data);
         return Response.ok(response).build();
     }
 
     @DELETE
-    @Path("/{userId}")
+    @Path("/{igrejaId}/{userId}")
     public Response deleteUsuario(@PathParam("igrejaId") Long igrejaId, @PathParam("userId") Long userId) {
         usuarioService.deleteUsuario(igrejaId, userId);
         return Response.noContent().build();

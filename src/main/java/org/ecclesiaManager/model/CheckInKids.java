@@ -53,6 +53,7 @@ public class CheckInKids {
         this.observacoes = dto.observacoes();
         this.dataEntrada = LocalDateTime.now();
         this.status = StatusCheckIn.ATIVO;
+        this.telefoneResponsavel = dto.telefoneResponsavel();
     }
 
     public Long getId() {

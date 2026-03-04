@@ -7,6 +7,7 @@ public record CheckInKidsRequestDTO(
         String nomeCrianca,
         @NotNull(message = "Selecione o responsável")
         String nomeResponsavel,
+        String telefoneResponsavel,
         String observacoes,
         Long igrejaId
 ) {
