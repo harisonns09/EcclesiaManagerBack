@@ -30,6 +30,13 @@ public class PessoaServiceImpl implements IPessoaService {
     @Inject
     IgrejaRepository igrejaRepository;
 
+    private String cleanDigits(String value) {
+        if (value == null || value.isBlank()) {
+            return null;
+        }
+        return value.replaceAll("[^0-9]", "");
+    }
+
     @Override
     public List<PessoaResponseDTO> findAllByIgrejaId(Long igrejaId) {
         return pessoaRepository.findAllByIgrejaId(igrejaId).stream()
@@ -60,6 +67,8 @@ public class PessoaServiceImpl implements IPessoaService {
 
         Pessoa newPessoa = new Pessoa(dto);
         newPessoa.setIgreja(igreja);
+        newPessoa.setTelefone(cleanDigits(dto.telefone()));
+
         pessoaRepository.persist(newPessoa);
         return new PessoaResponseDTO(newPessoa);
     }
@@ -83,7 +92,7 @@ public class PessoaServiceImpl implements IPessoaService {
 
         pessoa.setNome(dto.nome());
         pessoa.setDataNascimento(dto.dataNascimento());
-        pessoa.setTelefone(dto.telefone());
+        pessoa.setTelefone(cleanDigits(dto.telefone()));
         pessoa.setEmail(dto.email());
         pessoa.setMinisterio(dto.ministerio());
         pessoa.setStatus(dto.status());

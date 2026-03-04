@@ -19,7 +19,7 @@ public class InscricaoController {
     IInscricaoService inscricaoService;
 
     @GET
-    @Path("/{cpf}")
+    @Path("/publico/{cpf}")
     public Response buscarInscricoes(@PathParam("cpf") String cpf) {
         List<InscricaoResponseDTO> inscricoes = inscricaoService.buscarInscricoesPorCpf(cpf);
 

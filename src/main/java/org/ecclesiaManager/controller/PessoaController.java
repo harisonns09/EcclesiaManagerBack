@@ -13,7 +13,7 @@ import jakarta.ws.rs.core.Response;
 
 import java.util.List;
 
-@Path("/api")
+@Path("/api/pessoas")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class PessoaController {
@@ -22,13 +22,13 @@ public class PessoaController {
     IPessoaService pessoaService;
 
     @GET
-    @Path("/igrejas/{igrejaId}/membros")
+    @Path("/igrejas/{igrejaId}")
     public List<PessoaResponseDTO> getMembros(@PathParam("igrejaId") Long igrejaId) {
         return pessoaService.findAllByIgrejaId(igrejaId);
     }
 
     @GET
-    @Path("/igrejas/{igrejaId}/membros/{id}")
+    @Path("/igrejas/{igrejaId}/{id}")
     public Response carregarPessoa(@PathParam("igrejaId") Long igrejaId, @PathParam("id") Long id) {
         return pessoaService.findById(igrejaId, id)
                 .map(registro -> Response.ok(registro).build())
@@ -36,26 +36,26 @@ public class PessoaController {
     }
 
     @POST
-    @Path("/igrejas/{igrejaId}/membros")
+    @Path("/igrejas/{igrejaId}")
     public Response addPessoa(@PathParam("igrejaId") Long igrejaId, @Valid PessoaRequestDTO pessoa) {
         return Response.ok(pessoaService.addPessoa(igrejaId, pessoa)).build();
     }
 
     @DELETE
-    @Path("/igrejas/{igrejaId}/membros/{id}")
+    @Path("/igrejas/{igrejaId}/{id}")
     public Response deletePessoa(@PathParam("igrejaId") Long igrejaId, @PathParam("id") Long id) {
         pessoaService.deleteById(igrejaId, id);
         return Response.ok().build();
     }
 
     @PUT
-    @Path("/igrejas/{igrejaId}/membros/{id}")
+    @Path("/igrejas/{igrejaId}/{id}")
     public Response updatePessoa(@PathParam("igrejaId") Long igrejaId, @PathParam("id") Long id, @Valid PessoaRequestDTO dto) {
         return Response.ok(pessoaService.update(igrejaId, id, dto)).build();
     }
 
     @POST
-    @Path("/public/{igrejaId}/visitantes")
+    @Path("/publico/{igrejaId}/visitantes")
     public Response cadastrarVisitante(@PathParam("igrejaId") Long igrejaId, @Valid PessoaRequestDTO dto) {
         return Response.ok(pessoaService.addPessoa(igrejaId, dto)).build();
     }
@@ -67,13 +67,13 @@ public class PessoaController {
     }
 
     @POST
-    @Path("/public/{igrejaId}/membros")
+    @Path("/publico/{igrejaId}")
     public Response addPessoaPublic(@PathParam("igrejaId") Long igrejaId, @Valid PessoaRequestDTO pessoa) {
         return Response.ok(pessoaService.addPessoa(igrejaId, pessoa)).build();
     }
 
     @GET
-    @Path("/igrejas/{igrejaId}/membros/paginado")
+    @Path("/igrejas/{igrejaId}/paginado")
     public Response getMembersPaged(
             @PathParam("igrejaId") Long igrejaId,
             @QueryParam("nome") String nome,
@@ -90,7 +90,7 @@ public class PessoaController {
     }
 
     @PUT
-    @Path("/igrejas/{igrejaId}/membros/{id}/trilha")
+    @Path("/igrejas/{igrejaId}/{id}/trilha")
     public Response atualizarTrilha(@PathParam("igrejaId") Long igrejaId, @PathParam("id") Long id, @Valid TrilhaRequestDTO dto) {
         return Response.ok(pessoaService.atualizarTrilha(igrejaId, id, dto)).build();
     }

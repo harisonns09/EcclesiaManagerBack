@@ -40,7 +40,7 @@ public class InfinitePayService {
         var item = new InfinitePayItem(
                 "Inscricao - " + data.nome(),
                 1,
-                100
+                priceInCents
         );
 
         var metadata = new InfinitePayMetadata(

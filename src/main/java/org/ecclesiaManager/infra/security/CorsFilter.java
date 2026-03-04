@@ -11,27 +11,25 @@ import jakarta.ws.rs.ext.Provider;
 import java.io.IOException;
 import java.util.List;
 
-@Provider
-@PreMatching
+@Provider // Obrigatório para o Quarkus reconhecer
+@PreMatching // Obrigatório para rodar antes de procurar a rota real
 public class CorsFilter implements ContainerRequestFilter, ContainerResponseFilter {
 
     private static final List<String> ORIGENS_PERMITIDAS = List.of(
-            "http://localhost:5173", // O seu React rodando localmente
-            "https://ecclesia-manager-ten.vercel.app" // Exemplo: A URL de produção do seu React no futuro
+            "http://localhost:5173",
+            "https://ecclesia-manager-ten.vercel.app"
     );
 
     private String getOrigemPermitida(String originRecebida) {
         if (originRecebida != null && ORIGENS_PERMITIDAS.contains(originRecebida)) {
             return originRecebida;
         }
-        return ORIGENS_PERMITIDAS.get(0); // Cai para localhost como fallback seguro
+        return ORIGENS_PERMITIDAS.get(0);
     }
 
     @Override
     public void filter(ContainerRequestContext requestContext) throws IOException {
-        // Responde ao Preflight (OPTIONS) do navegador imediatamente com status 200 OK
         if (requestContext.getMethod().equalsIgnoreCase("OPTIONS")) {
-
             String origin = requestContext.getHeaderString("Origin");
             String allowedOrigin = getOrigemPermitida(origin);
 
@@ -46,7 +44,6 @@ public class CorsFilter implements ContainerRequestFilter, ContainerResponseFilt
 
     @Override
     public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext) throws IOException {
-        // Injeta os cabeçalhos em todas as respostas normais (sucesso ou erro) da API
         String origin = requestContext.getHeaderString("Origin");
         String allowedOrigin = getOrigemPermitida(origin);
 
