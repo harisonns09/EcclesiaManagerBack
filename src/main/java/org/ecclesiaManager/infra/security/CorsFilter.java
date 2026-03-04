@@ -11,8 +11,8 @@ import jakarta.ws.rs.ext.Provider;
 import java.io.IOException;
 import java.util.List;
 
-@Provider // Obrigatório para o Quarkus reconhecer
-@PreMatching // Obrigatório para rodar antes de procurar a rota real
+//@Provider // Obrigatório para o Quarkus reconhecer
+//@PreMatching // Obrigatório para rodar antes de procurar a rota real
 public class CorsFilter implements ContainerRequestFilter, ContainerResponseFilter {
 
     private static final List<String> ORIGENS_PERMITIDAS = List.of(
