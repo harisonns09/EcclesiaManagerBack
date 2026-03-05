@@ -3,6 +3,9 @@ package org.ecclesiaManager.model;
 import org.ecclesiaManager.enums.UserRole;
 import jakarta.persistence.*;
 
+import java.util.HashSet;
+import java.util.Set;
+
 @Entity
 @Table(name = "tb_usuarios")
 public class Usuario {
@@ -21,16 +24,26 @@ public class Usuario {
     @JoinColumn(name = "igreja_id", nullable = true)
     private Igreja igreja;
 
-    @Enumerated(EnumType.STRING)
-    private UserRole role;
+    @ManyToOne
+    @JoinColumn(name = "perfil_id")
+    private Perfil perfil;
+
+    // 🔥 NOVO: Permissões extras específicas apenas para este usuário (Checkboxes)
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "tb_usuario_permissao",
+            joinColumns = @JoinColumn(name = "usuario_id"),
+            inverseJoinColumns = @JoinColumn(name = "permissao_id")
+    )
+    private Set<Permissao> permissoes = new HashSet<>();
 
     public Usuario() {
     }
 
-    public Usuario(String username, String password, UserRole role, Igreja igreja) {
+    public Usuario(String username, String password, Perfil perfil, Igreja igreja) {
         this.username = username;
         this.password = password;
-        this.role = role;
+        this.perfil = perfil;
         this.igreja = igreja;
     }
 
@@ -58,14 +71,6 @@ public class Usuario {
         this.password = password;
     }
 
-    public UserRole getRole() {
-        return role;
-    }
-
-    public void setRole(UserRole role) {
-        this.role = role;
-    }
-
     public Igreja getIgreja() {
         return igreja;
     }
@@ -73,4 +78,21 @@ public class Usuario {
     public void setIgreja(Igreja igreja) {
         this.igreja = igreja;
     }
+
+    public Perfil getPerfil() {
+        return perfil;
+    }
+
+    public void setPerfil(Perfil perfil) {
+        this.perfil = perfil;
+    }
+
+    public Set<Permissao> getPermissoes() {
+        return permissoes;
+    }
+
+    public void setPermissoes(Set<Permissao> permissoes) {
+        this.permissoes = permissoes;
+    }
+
 }

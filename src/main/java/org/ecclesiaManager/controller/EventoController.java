@@ -2,6 +2,7 @@ package org.ecclesiaManager.controller;
 
 import jakarta.annotation.security.PermitAll;
 import jakarta.annotation.security.RolesAllowed;
+import org.ecclesiaManager.infra.audit.Loggable;
 import org.ecclesiaManager.model.dto.EventoRequestDTO;
 import org.ecclesiaManager.model.dto.EventoResponseDTO;
 import org.ecclesiaManager.model.dto.InscricaoRequestDTO;
@@ -42,6 +43,8 @@ public class EventoController {
     @POST
     @Path("/igrejas/{idIgreja}")
     @RolesAllowed({"ADMIN", "LIDER"})
+    @Loggable(action = "Criou", entity = "Evento")
+
     public Response addEvento(@PathParam("idIgreja") Long idIgreja, @Valid EventoRequestDTO evento) {
         return Response.ok(eventoService.addEvento(idIgreja, evento)).build();
     }
@@ -49,6 +52,8 @@ public class EventoController {
     @DELETE
     @Path("/igrejas/{idIgreja}/{id}")
     @RolesAllowed({"ADMIN", "LIDER"})
+    @Loggable(action = "Deletou", entity = "Evento")
+
     public Response deleteEvento(@PathParam("idIgreja") Long idIgreja, @PathParam("id") Long id) {
         eventoService.deleteById(idIgreja, id);
         return Response.ok().build();
@@ -57,6 +62,8 @@ public class EventoController {
     @PUT
     @Path("/igrejas/{idIgreja}/{id}")
     @RolesAllowed({"ADMIN", "LIDER"})
+    @Loggable(action = "Alterou", entity = "Evento")
+
     public Response updateEvento(@PathParam("idIgreja") Long idIgreja, @PathParam("id") Long id, @Valid EventoRequestDTO dto) {
         return Response.ok(eventoService.update(idIgreja, id, dto)).build();
     }

@@ -60,7 +60,6 @@ public class PessoaServiceImpl implements IPessoaService {
 
     @Override
     @Transactional
-    @Loggable(action = "CRIAR", entity = "MEMBRO")
     public PessoaResponseDTO addPessoa(Long igrejaId, PessoaRequestDTO dto) {
         Igreja igreja = igrejaRepository.findByIdOptional(igrejaId)
                 .orElseThrow(() -> new WebApplicationException("Igreja não encontrada", Response.Status.NOT_FOUND));
@@ -84,7 +83,6 @@ public class PessoaServiceImpl implements IPessoaService {
 
     @Override
     @Transactional
-    @Loggable(action = "ALTERAR", entity = "MEMBRO")
     public PessoaResponseDTO update(Long igrejaId, Long pessoaId, PessoaRequestDTO dto) {
         Pessoa pessoa = pessoaRepository.findByIdOptional(pessoaId)
                 .filter(p -> p.getIgreja().getId().equals(igrejaId))
@@ -156,7 +154,6 @@ public class PessoaServiceImpl implements IPessoaService {
 
     @Override
     @Transactional
-    @Loggable(action = "ATUALIZAR_TRILHA", entity = "MEMBRO")
     public PessoaResponseDTO atualizarTrilha(Long igrejaId, Long pessoaId, TrilhaRequestDTO dto) {
         Pessoa pessoa = pessoaRepository.findByIdOptional(pessoaId)
                 .filter(p -> p.getIgreja().getId().equals(igrejaId))

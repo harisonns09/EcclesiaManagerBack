@@ -23,6 +23,7 @@ public class AuditLog {
     @Column(length = 1000)
     private String details;
 
+    private String status;
 
     @Column(name = "church_id", nullable = false)
     private Long churchId;
@@ -99,5 +100,11 @@ public class AuditLog {
         this.id = id;
     }
 
+    public String getStatus(){
+        return status;
+    }
 
+    public void setStatus(String status){
+        this.status = status;
+    }
 }

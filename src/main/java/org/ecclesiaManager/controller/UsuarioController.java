@@ -8,12 +8,14 @@ import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.ecclesiaManager.enums.UserRole;
+import org.ecclesiaManager.model.dto.PerfilResponseDTO;
 import org.ecclesiaManager.model.dto.UsuarioRequestDTO;
 import org.ecclesiaManager.model.dto.UsuarioResponseDTO;
 import org.ecclesiaManager.service.IUsuarioService;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Path("/api/usuarios")
 @Produces(MediaType.APPLICATION_JSON)
@@ -26,11 +28,21 @@ public class UsuarioController {
 
     @GET
     @Path("/roles")
-    @Produces(MediaType.APPLICATION_JSON) // Adicionado para consistência
-    public List<String> listarRoles() {
-        return Arrays.stream(UserRole.values())
-                .map(Enum::name)
-                .toList();
+    public Response getRoles() {
+
+        List<String> nomesPerfis = usuarioService.carregarPerfis().stream()
+                .map(perfil -> perfil.nome()) // Extrai o nome do record
+                .collect(Collectors.toList());
+
+        // 3. Devolve a lista de Strings para o React
+        return Response.ok(nomesPerfis).build();
+    }
+
+    @GET
+    @Path("/permissoes")
+    public Response getPermissoes() {
+        // Retorna direto a List<String> com as permissões cadastradas
+        return Response.ok(usuarioService.carregarPermissoes()).build();
     }
 
     @GET
@@ -43,7 +55,7 @@ public class UsuarioController {
     @Path("/{igrejaId}")
     public Response register(@PathParam("igrejaId") Long igrejaId, @Valid UsuarioRequestDTO data) {
         // Criando um novo DTO para garantir que o igrejaId do path seja usado
-        UsuarioRequestDTO request = new UsuarioRequestDTO(data.id(), data.user(), data.password(), data.role(), igrejaId);
+        UsuarioRequestDTO request = new UsuarioRequestDTO(data.id(), data.user(), data.password(), data.perfil(), data.permissions(), igrejaId);
         return usuarioService.register(request);
     }
 
