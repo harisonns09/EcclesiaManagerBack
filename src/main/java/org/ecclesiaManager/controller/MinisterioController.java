@@ -29,7 +29,6 @@ public class MinisterioController {
 
     @GET
     @Path("/igrejas/{igrejaId}/{id}")
-    @Loggable(action = "CONSULTAR", entity = "MINISTERIO")
     public Response carregarMinisterio(@PathParam("id") Long id) {
         return ministerioService.findById(id)
                 .map(registro -> Response.ok(registro).build())
@@ -38,6 +37,8 @@ public class MinisterioController {
 
     @POST
     @Path("/igrejas/{igrejaId}")
+    @Loggable(action = "Criou", entity = "Ministerio")
+
     public Response addMinisterio(@PathParam("igrejaId") Long igrejaId, @Valid MinisterioRequestDTO ministerio) {
         try {
             return Response.ok(ministerioService.addMinisterio(igrejaId, ministerio)).build();
@@ -48,6 +49,8 @@ public class MinisterioController {
 
     @DELETE
     @Path("/igrejas/{igrejaId}/{id}")
+    @Loggable(action = "Deletou", entity = "Ministerio")
+
     public Response deleteMinisterio(@PathParam("igrejaId") Long igrejaId, @PathParam("id") Long id) {
         ministerioService.deleteById(igrejaId, id);
         return Response.ok().build();
@@ -55,6 +58,8 @@ public class MinisterioController {
 
     @PUT
     @Path("/igrejas/{igrejaId}/{id}")
+    @Loggable(action = "Alterou", entity = "Ministerio")
+
     public Response updateMinisterio(@PathParam("igrejaId") Long igrejaId, @PathParam("id") Long id, MinisterioRequestDTO dto) {
         return Response.ok(ministerioService.updateMinisterio(igrejaId, id, dto)).build();
     }

@@ -1,5 +1,6 @@
 package org.ecclesiaManager.controller;
 
+import org.ecclesiaManager.infra.audit.Loggable;
 import org.ecclesiaManager.model.dto.PageResponseDTO;
 import org.ecclesiaManager.model.dto.PessoaRequestDTO;
 import org.ecclesiaManager.model.dto.PessoaResponseDTO;
@@ -50,6 +51,7 @@ public class PessoaController {
 
     @PUT
     @Path("/igrejas/{igrejaId}/{id}")
+    @Loggable(action = "Alteração dados cadastrais", entity = "MEMBRO") // 🔥 Gera o log automaticamente
     public Response updatePessoa(@PathParam("igrejaId") Long igrejaId, @PathParam("id") Long id, @Valid PessoaRequestDTO dto) {
         return Response.ok(pessoaService.update(igrejaId, id, dto)).build();
     }

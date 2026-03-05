@@ -37,7 +37,6 @@ public class MinisterioServiceImpl implements IMinisterioService {
 
     @Override
     @Transactional
-    @Loggable(action = "CRIAR", entity = "MINISTERIO")
     public MinisterioResponseDTO addMinisterio(Long igrejaId, MinisterioRequestDTO dto) {
         Igreja igreja = igrejaRepository.findByIdOptional(igrejaId)
                 .orElseThrow(() -> new RuntimeException("Igreja não encontrada com ID: " + igrejaId));
@@ -50,7 +49,6 @@ public class MinisterioServiceImpl implements IMinisterioService {
 
     @Override
     @Transactional
-    @Loggable(action = "DELETAR", entity = "MINISTERIO")
     public void deleteById(Long idIgreja, Long idMinisterio) {
         Ministerio ministerio = ministerioRepository.findByIdOptional(idMinisterio)
                 .orElseThrow(() -> new RuntimeException("Ministério não encontrado com ID: " + idMinisterio));
@@ -63,7 +61,6 @@ public class MinisterioServiceImpl implements IMinisterioService {
 
     @Override
     @Transactional
-    @Loggable(action = "ALTERAR", entity = "MINISTERIO")
     public MinisterioResponseDTO updateMinisterio(Long idIgreja, Long idMinisterio, MinisterioRequestDTO dto) {
         Ministerio ministerio = ministerioRepository.findByIdOptional(idMinisterio)
                 .orElseThrow(() -> new RuntimeException("Ministerio não encontrado com ID: " + idMinisterio));

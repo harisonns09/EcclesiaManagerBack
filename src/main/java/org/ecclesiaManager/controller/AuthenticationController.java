@@ -7,6 +7,7 @@ import jakarta.validation.Valid;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import org.ecclesiaManager.infra.audit.Loggable;
 import org.ecclesiaManager.infra.security.TokenService;
 import org.ecclesiaManager.model.Usuario;
 import org.ecclesiaManager.model.dto.AuthenticationDTO;
@@ -27,6 +28,7 @@ public class AuthenticationController {
     @POST
     @Path("/login")
     @PermitAll
+    @Loggable(action = "Login", entity = "Usuário")
     public Response login(@Valid AuthenticationDTO data) {
         Usuario usuario = usuarioRepository.findByUsername(data.login());
 
