@@ -1,6 +1,6 @@
-// EcclesiaManager/src/main/java/org/ecclesiaManager/infra/audit/AuditInterceptor.java
 package org.ecclesiaManager.infra.audit;
 
+import io.quarkus.arc.Arc;
 import io.quarkus.narayana.jta.QuarkusTransaction;
 import io.quarkus.security.identity.SecurityIdentity;
 import jakarta.annotation.Priority;
@@ -32,7 +32,20 @@ public class AuditInterceptor {
     @AroundInvoke
     public Object logAuditoria(InvocationContext context) throws Exception {
         Loggable loggable = context.getMethod().getAnnotation(Loggable.class);
-        String username = (securityIdentity.isAnonymous()) ? "SISTEMA" : securityIdentity.getPrincipal().getName();
+
+        // 1. O Padrão é SISTEMA para rotinas de Background (Batch)
+        String username = "SISTEMA";
+
+        // 2. Apenas tenta buscar o usuário se existir um contexto HTTP ativo
+        if (Arc.container().requestContext().isActive()) {
+            try {
+                if (!securityIdentity.isAnonymous()) {
+                    username = securityIdentity.getPrincipal().getName();
+                }
+            } catch (Exception ignored) {
+                // Silencia caso ocorra algum erro inesperado na segurança
+            }
+        }
 
         Object result;
         try {
@@ -45,27 +58,19 @@ public class AuditInterceptor {
         }
     }
 
-    /**
-     * Tenta encontrar um campo identificador amigável no objeto (Nome, Descrição, Login, etc).
-     * Isso evita expor senhas ou nomes técnicos de DTOs.
-     */
     private String obterIdentificadorAmigavel(Object obj) {
         if (obj == null) return "";
 
-        // Se for um ID simples ou String direta, retorna o valor
         if (obj instanceof Number || obj instanceof String || obj instanceof Boolean) {
             return obj.toString();
         }
 
         Class<?> clazz = obj.getClass();
-        // Lista restrita de campos identificadores amigáveis.
-        // 🔥 NUNCA inclua 'password' ou 'senha' aqui.
         String[] camposParaBuscar = { "nome", "descricao", "nomeEvento", "titulo", "login", "username"};
 
         for (String campo : camposParaBuscar) {
             try {
                 Object valor = null;
-                // Tenta como Record (obj.nome()) ou JavaBean (obj.getNome())
                 try {
                     valor = clazz.getMethod(campo).invoke(obj);
                 } catch (NoSuchMethodException e) {
@@ -79,7 +84,7 @@ public class AuditInterceptor {
             } catch (Exception ignored) { }
         }
 
-        return ""; // Se não achar nada amigável, retorna vazio (evita AuthenticationDTO)
+        return "";
     }
 
     private void salvarLog(Loggable loggable, String username, InvocationContext context, String status, String erro) {
@@ -91,14 +96,12 @@ public class AuditInterceptor {
             log.setStatus(status);
             log.setChurchId(buscarChurchId(context));
 
-            // Extrai identificadores amigáveis de todos os parâmetros
             List<String> identificadores = new ArrayList<>();
             for (Object p : context.getParameters()) {
                 String iden = obterIdentificadorAmigavel(p);
                 if (!iden.isEmpty()) identificadores.add(iden);
             }
 
-            // Constrói o formato: "Ação, Entidade, Identificador"
             String identificadorFinal = identificadores.isEmpty() ? "Registro" : String.join(", ", identificadores);
             String detalhes = String.format("%s, %s, %s",
                     loggable.action(),
@@ -120,11 +123,15 @@ public class AuditInterceptor {
     }
 
     private Long buscarChurchId(InvocationContext context) {
-        try {
-            if (jwt != null && jwt.containsClaim("churchId")) {
-                return Long.parseLong(jwt.getClaim("churchId").toString());
-            }
-        } catch (Exception ignored) { }
+        // Protege também o acesso ao JWT, pois ele sofre do mesmo problema em rotinas Batch
+        if (Arc.container().requestContext().isActive()) {
+            try {
+                if (jwt != null && jwt.containsClaim("churchId")) {
+                    return Long.parseLong(jwt.getClaim("churchId").toString());
+                }
+            } catch (Exception ignored) { }
+        }
+
         for (Object arg : context.getParameters()) {
             if (arg instanceof Long) return (Long) arg;
         }

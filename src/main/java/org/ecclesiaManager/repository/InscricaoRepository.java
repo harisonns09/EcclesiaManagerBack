@@ -4,6 +4,7 @@ import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase;
 import jakarta.enterprise.context.ApplicationScoped;
 import org.ecclesiaManager.model.Inscricao;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @ApplicationScoped
@@ -28,5 +29,9 @@ public class InscricaoRepository implements PanacheRepositoryBase<Inscricao, Lon
 
     public void deleteAllByEventoId(Long eventoId) {
         delete("evento.id", eventoId);
+    }
+
+    public List<Inscricao> findInscricoesParaLembrete(LocalDate dataEvento) {
+        return list("evento.dataEvento = ?1 and status != 'CANCELADO'", dataEvento);
     }
 }
