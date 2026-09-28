@@ -9,6 +9,8 @@ public record PedidoRequestDTO(
         String telefoneComprador,
         String cpfComprador, // O Java aceita nulo sem problemas se o front não enviar
         Long produtoId,
+        String description,
         Integer quantidade,
-        BigDecimal amount
+        BigDecimal amount,
+        String codigoCompra
 ) {}

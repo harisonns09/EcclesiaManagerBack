@@ -22,9 +22,7 @@ public class Pedido {
     @JoinColumn(name = "igreja_id", nullable = false)
     private Igreja igreja;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "pessoa_id", nullable = false)
-    private Pessoa comprador;
+    private String comprador;
 
     @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ItemPedido> itens = new ArrayList<>();

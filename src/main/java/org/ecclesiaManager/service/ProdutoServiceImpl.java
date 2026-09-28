@@ -32,7 +32,7 @@ public class ProdutoServiceImpl implements IProdutoService {
         produto.setNome(dto.nome());
         produto.setDescricao(dto.descricao());
         produto.setPreco(dto.preco());
-        produto.setEstoque(dto.estoque());
+        produto.setEstoque(dto.estoque() != null ? dto.estoque() : 0);
         produto.setImageUrl(dto.imageUrl());
         produto.setAtivo(dto.ativo() != null ? dto.ativo() : true);
         produto.setIgreja(igreja);
@@ -50,7 +50,9 @@ public class ProdutoServiceImpl implements IProdutoService {
         produto.setNome(dto.nome());
         produto.setDescricao(dto.descricao());
         produto.setPreco(dto.preco());
-        produto.setEstoque(dto.estoque());
+        if (dto.estoque() != null) {
+            produto.setEstoque(dto.estoque());
+        }
         produto.setImageUrl(dto.imageUrl());
 
         if (dto.ativo() != null) {

@@ -5,11 +5,13 @@ import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import org.ecclesiaManager.enums.StatusPagamento;
 import org.ecclesiaManager.model.*;
+import org.ecclesiaManager.model.dto.CheckoutResponseDTO;
 import org.ecclesiaManager.model.dto.PedidoRequestDTO;
 import org.ecclesiaManager.repository.*;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @ApplicationScoped
 public class PedidoServiceImpl implements IPedidoService {
@@ -18,17 +20,7 @@ public class PedidoServiceImpl implements IPedidoService {
     PedidoRepository pedidoRepository;
 
     @Inject
-    ProdutoRepository produtoRepository;
-
-    @Inject
-    PessoaRepository pessoaRepository;
-
-    @Inject
     IgrejaRepository igrejaRepository;
-
-    // Injetar o seu serviço existente
-    @Inject
-    InfinitePayService infinitePayService;
 
     @Override
     @Transactional
@@ -36,59 +28,20 @@ public class PedidoServiceImpl implements IPedidoService {
         Igreja igreja = igrejaRepository.findByIdOptional(igrejaId)
                 .orElseThrow(() -> new RuntimeException("Igreja não encontrada"));
 
-        Pessoa comprador = pessoaRepository.findByIdOptional(dto.pessoaId())
-                .orElseThrow(() -> new RuntimeException("Comprador não encontrado"));
-
         Pedido pedido = new Pedido();
         pedido.setIgreja(igreja);
-        pedido.setComprador(comprador);
+        pedido.setComprador(dto.nomeComprador());
         pedido.setStatusPagamento(StatusPagamento.PENDENTE);
+        pedido.setValorTotal(dto.amount());
 
-        BigDecimal total = BigDecimal.ZERO;
-
-        for (var itemDto : dto.itens()) {
-            Produto produto = produtoRepository.findByIdOptional(itemDto.produtoId())
-                    .orElseThrow(() -> new RuntimeException("Produto não encontrado"));
-
-            if (produto.getEstoque() < itemDto.quantidade()) {
-                throw new RuntimeException("Estoque insuficiente para: " + produto.getNome());
-            }
-
-            produto.setEstoque(produto.getEstoque() - itemDto.quantidade());
-
-            ItemPedido item = new ItemPedido();
-            item.setPedido(pedido);
-            item.setProduto(produto);
-            item.setQuantidade(itemDto.quantidade());
-            item.setPrecoUnitario(produto.getPreco());
-
-            pedido.getItens().add(item);
-            total = total.add(produto.getPreco().multiply(BigDecimal.valueOf(itemDto.quantidade())));
-        }
-
-        pedido.setValorTotal(total);
-
-        // 1. Guardar o pedido para gerar o ID que enviaremos para a InfinitePay
+        // O pedido é salvo aqui, mas a transação ainda não foi commitada
         pedidoRepository.persist(pedido);
 
-        // 2. Integração com a InfinitePay
-        if (total.compareTo(BigDecimal.ZERO) > 0) {
-            try {
-                // Adapte o nome do método caso seja diferente no seu InfinitePayService
-                String linkPagamento = infinitePayService.gerarLinkProdutoCheckout(pedido);
-                pedido.setLinkPagamento(linkPagamento);
 
-                // Atualiza o pedido com o link
-                pedidoRepository.persist(pedido);
-            } catch (Exception e) {
-                throw new RuntimeException("Erro ao gerar link de pagamento: " + e.getMessage());
-            }
-        } else {
-            pedido.setStatusPagamento(StatusPagamento.PAGO);
-        }
-
+        // A transação será commitada aqui, salvando o pedido no banco.
         return pedido;
     }
+
 
     @Override
     public List<Pedido> listar(Long igrejaId) {
@@ -106,6 +59,4 @@ public class PedidoServiceImpl implements IPedidoService {
 
         return pedido;
     }
-
-
 }

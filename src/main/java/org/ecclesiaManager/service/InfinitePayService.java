@@ -7,15 +7,17 @@ import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-import org.ecclesiaManager.model.Pedido;
+import org.ecclesiaManager.model.dto.PedidoRequestDTO;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.ecclesiaManager.model.dto.CheckoutRequestDTO;
 import org.ecclesiaManager.model.dto.CheckoutResponseDTO;
 import org.ecclesiaManager.model.dto.infinitepay.*;
 
-import java.util.ArrayList;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @ApplicationScoped
 public class InfinitePayService {
@@ -79,7 +81,6 @@ public class InfinitePayService {
 
             Response response = client.target(apiUrl)
                     .request(MediaType.APPLICATION_JSON)
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + apiToken)
                     .post(Entity.entity(payload, MediaType.APPLICATION_JSON));
 
             if (response.getStatus() >= 200 && response.getStatus() < 300) {
@@ -101,56 +102,63 @@ public class InfinitePayService {
         }
     }
 
-    public String gerarLinkProdutoCheckout(Pedido pedido) {
-        // Configurar Cliente
-        InfinitePayCustomerDTO customer = new InfinitePayCustomerDTO(
-                pedido.getComprador().getNome(),
-                pedido.getComprador().getEmail(),
-                null // phoneNumber - você pode adicionar isso se tiver
+    public CheckoutResponseDTO createProdutoCheckout(PedidoRequestDTO data) {
+
+        BigDecimal unitPrice;
+        if (data.quantidade() != null && data.quantidade() > 0) {
+            unitPrice = data.amount().divide(new BigDecimal(data.quantidade()), 2, RoundingMode.HALF_UP);
+        } else {
+            unitPrice = data.amount();
+        }
+        int unitPriceInCents = unitPrice.multiply(new BigDecimal("100")).intValue();
+
+        var item = new InfinitePayItem(
+                data.description(),
+                data.quantidade(),
+                100//unitPriceInCents // Agora envia o preço unitário correto
         );
 
-        // Configurar Itens
-        List<InfinitePayItem> items = new ArrayList<>();
-        for (var item : pedido.getItens()) {
-            InfinitePayItem infiniteItem = new InfinitePayItem(
-                    item.getProduto().getNome(),
-                    item.getQuantidade(),
-                    item.getPrecoUnitario().multiply(new java.math.BigDecimal(100)).intValue()
-            );
-            items.add(infiniteItem);
+        var metadata = new InfinitePayMetadata(
+                data.nomeComprador(),
+                data.emailComprador(),
+                data.amount().toString(),
+                data.codigoCompra()
+        );
+
+        var custumer = new InfinitePayCustomerDTO(
+                data.nomeComprador(),
+                data.emailComprador(),
+                data.telefoneComprador()
+        );
+
+        String orderNsu = data.codigoCompra();
+        if (orderNsu == null || orderNsu.isEmpty()) {
+            orderNsu = UUID.randomUUID().toString();
         }
 
-        // Metadados (CRUCIAL para o Webhook saber qual é o pedido)
-        InfinitePayMetadata metadata = new InfinitePayMetadata(
-                pedido.getComprador().getNome(),
-                pedido.getComprador().getEmail(),
-                pedido.getValorTotal().toString(),
-                pedido.getId().toString()
-        );
+        String returnUrl = redirectBase + "/" + data.produtoId() + "/compra?status=success&transactionId=" + orderNsu;
 
-        String orderNsu = pedido.getId().toString();
-        String returnUrl = redirectBase + "/meus-pedidos?status=success&pedidoId=" + orderNsu;
-
-        InfinitePayCheckoutRequestDTO payload = new InfinitePayCheckoutRequestDTO(
+        var payload = new InfinitePayCheckoutRequestDTO(
                 handle,
-                items,
+                List.of(item),
                 orderNsu,
                 returnUrl,
                 webhookUrlConfig,
-                customer,
+                custumer,
                 metadata
         );
 
         try (Client client = ClientBuilder.newClient()) {
+
             Response response = client.target(apiUrl)
                     .request(MediaType.APPLICATION_JSON)
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + apiToken)
                     .post(Entity.entity(payload, MediaType.APPLICATION_JSON));
 
             if (response.getStatus() >= 200 && response.getStatus() < 300) {
                 InfinitePayCheckoutResponseDTO responseBody = response.readEntity(InfinitePayCheckoutResponseDTO.class);
+
                 if (responseBody != null && responseBody.url() != null) {
-                    return responseBody.url();
+                    return new CheckoutResponseDTO(responseBody.url(), responseBody.id());
                 } else {
                     throw new RuntimeException("InfinitePay retornou resposta vazia.");
                 }
@@ -158,6 +166,7 @@ public class InfinitePayService {
                 String errorBody = response.readEntity(String.class);
                 throw new RuntimeException("Erro na InfinitePay: HTTP " + response.getStatus() + " - " + errorBody);
             }
+
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException("Erro ao gerar link InfinitePay: " + e.getMessage());
