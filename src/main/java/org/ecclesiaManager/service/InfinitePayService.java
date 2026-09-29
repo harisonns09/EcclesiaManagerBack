@@ -1,12 +1,14 @@
 package org.ecclesiaManager.service;
 
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import jakarta.ws.rs.client.Client;
 import jakarta.ws.rs.client.ClientBuilder;
 import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import org.jboss.logging.Logger;
 import org.ecclesiaManager.model.dto.PedidoRequestDTO;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.ecclesiaManager.model.dto.CheckoutRequestDTO;
@@ -21,6 +23,9 @@ import java.util.stream.Collectors;
 
 @ApplicationScoped
 public class InfinitePayService {
+
+    @Inject
+    Logger logger;
 
     @ConfigProperty(name = "infinitepay-api.url")
     String apiUrl;
@@ -100,8 +105,8 @@ public class InfinitePayService {
             }
 
         } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException("Erro ao gerar link InfinitePay: " + e.getMessage());
+            logger.error("Erro ao gerar link de checkout para evento na InfinitePay", e);
+            throw new RuntimeException("Erro ao gerar link de pagamento. Tente novamente mais tarde.", e);
         }
     }
 
@@ -171,8 +176,8 @@ public class InfinitePayService {
             }
 
         } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException("Erro ao gerar link InfinitePay: " + e.getMessage());
+            logger.error("Erro ao gerar link de checkout para produto na InfinitePay", e);
+            throw new RuntimeException("Erro ao gerar link de pagamento. Tente novamente mais tarde.", e);
         }
     }
 }
