@@ -17,4 +17,8 @@ public class PedidoRepository implements PanacheRepositoryBase<Pedido, Long> {
         // Assume que a propriedade na sua entidade Pedido se chama "comprador"
         return list("comprador.id", compradorId);
     }
+
+    public Pedido findByNumero_Transacao(String nrTransacao) {
+        return find("transacaoId", nrTransacao).firstResult();
+    }
 }

@@ -37,6 +37,9 @@ public class InfinitePayService {
     @ConfigProperty(name = "infinitepay.webhook-url")
     String webhookUrlConfig;
 
+    @ConfigProperty(name = "infinitepay.webhookLoja-url")
+    String webhookLojaUrlConfig;
+
     public CheckoutResponseDTO createCheckoutLink(String eventId, CheckoutRequestDTO data) {
 
         int priceInCents = data.amount().multiply(new java.math.BigDecimal("100")).intValue();
@@ -115,7 +118,7 @@ public class InfinitePayService {
         var item = new InfinitePayItem(
                 data.description(),
                 data.quantidade(),
-                100//unitPriceInCents // Agora envia o preço unitário correto
+                unitPriceInCents // Agora envia o preço unitário correto
         );
 
         var metadata = new InfinitePayMetadata(
@@ -143,7 +146,7 @@ public class InfinitePayService {
                 List.of(item),
                 orderNsu,
                 returnUrl,
-                webhookUrlConfig,
+                webhookLojaUrlConfig,
                 custumer,
                 metadata
         );

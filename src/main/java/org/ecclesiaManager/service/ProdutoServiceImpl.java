@@ -34,7 +34,6 @@ public class ProdutoServiceImpl implements IProdutoService {
         produto.setPreco(dto.preco());
         produto.setEstoque(dto.estoque() != null ? dto.estoque() : 0);
         produto.setImageUrl(dto.imageUrl());
-        produto.setAtivo(dto.ativo() != null ? dto.ativo() : true);
         produto.setIgreja(igreja);
 
         // No Panache usamos persist em vez de save
@@ -54,10 +53,6 @@ public class ProdutoServiceImpl implements IProdutoService {
             produto.setEstoque(dto.estoque());
         }
         produto.setImageUrl(dto.imageUrl());
-
-        if (dto.ativo() != null) {
-            produto.setAtivo(dto.ativo());
-        }
 
         // Como o produto já está "managed" pela transação, o Hibernate atualiza
         // automaticamente na base de dados, mas chamamos o persist por clareza.

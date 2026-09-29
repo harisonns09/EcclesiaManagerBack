@@ -6,6 +6,7 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.ecclesiaManager.model.dto.infinitepay.InfinitePayWebhookDTO;
 import org.ecclesiaManager.service.IEventoService;
+import org.ecclesiaManager.service.IPedidoService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,6 +20,10 @@ public class WebhookController {
     @Inject
     IEventoService eventoService;
 
+    @Inject
+    IPedidoService pedidoService;
+
+
     @POST
     @Path("/infinitepay")
     public Response handleInfinitePayWebhook(InfinitePayWebhookDTO payload) {
@@ -27,6 +32,23 @@ public class WebhookController {
 
         try {
             eventoService.processarPagamentoWebhook(payload);
+
+            return Response.ok().build();
+        } catch (Exception e) {
+            logger.error("Erro ao processar webhook", e);
+
+            return Response.serverError().build();
+        }
+    }
+
+    @POST
+    @Path("/infinitepay/loja")
+    public Response handleInfinitePayLojaWebhook(InfinitePayWebhookDTO payload) {
+
+        logger.info("Webhook InfinitePay recebido. Order NSU: {}", payload.orderNsu());
+
+        try {
+            pedidoService.processarPagamentoWebhook(payload);
 
             return Response.ok().build();
         } catch (Exception e) {

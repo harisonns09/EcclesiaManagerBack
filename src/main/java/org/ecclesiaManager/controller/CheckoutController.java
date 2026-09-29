@@ -34,7 +34,6 @@ public class CheckoutController {
     @POST
     @Path("/publico/produtos/{produtoId}")
     public Response createCheckoutProduto(
-
             PedidoRequestDTO data
     ) {
         CheckoutResponseDTO response = infinitePayService.createProdutoCheckout(data);

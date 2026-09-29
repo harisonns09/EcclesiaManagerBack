@@ -38,4 +38,6 @@ public class Pedido {
     private String transacaoId; // ID retornado pela InfinitePay
 
     private LocalDateTime dataCriacao = LocalDateTime.now();
+    private LocalDateTime dataPagamento;
+    private String comprovante;
 }
