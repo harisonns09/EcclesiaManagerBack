@@ -57,6 +57,9 @@ public class Inscricao {
     @Column(name = "valor_pago")
     private BigDecimal valorPago;
 
+    @Column(name = "campo_igreja_atual")
+    private String campoIgreja;
+
     public Inscricao() {
         super();
     }
@@ -182,5 +185,13 @@ public class Inscricao {
 
     public void setValorPago(BigDecimal valorPago) {
         this.valorPago = valorPago;
+    }
+
+    public String getCampoIgreja() {
+        return campoIgreja;
+    }
+
+    public void setCampoIgreja(String campoIgreja) {
+        this.campoIgreja = campoIgreja;
     }
 }

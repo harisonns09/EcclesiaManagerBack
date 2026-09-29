@@ -1,0 +1,17 @@
+<job id="notificacoes-job" xmlns="https://jakarta.ee/xml/ns/jakartaee" version="2.0">
+    <step id="aniversariantes-step">
+        <chunk item-count="10">
+            <reader ref="aniversarianteReader"/>
+            <processor ref="notificacaoProcessor"/>
+            <writer ref="comunicacaoWriter"/>
+        </chunk>
+    </step>
+
+<!--    <step id="lembretes-step">-->
+<!--        <chunk item-count="10">-->
+<!--            <reader ref="lembreteEventoReader"/>-->
+<!--            <processor ref="notificacaoProcessor"/>-->
+<!--            <writer ref="comunicacaoWriter"/>-->
+<!--        </chunk>-->
+<!--    </step>-->
+</job>

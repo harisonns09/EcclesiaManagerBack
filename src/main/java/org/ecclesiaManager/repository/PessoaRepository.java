@@ -31,4 +31,8 @@ public class PessoaRepository implements PanacheRepositoryBase<Pessoa, Long> {
     public List<Pessoa> findAniversariantesDoMes(Long igrejaId, int mes) {
         return list("igreja.id = ?1 and month(dataNascimento) = ?2 order by day(dataNascimento)", igrejaId, mes);
     }
+
+    public List<Pessoa> findAniversariantesDoDia(int mes, int dia) {
+        return list("month(dataNascimento) = ?1 and day(dataNascimento) = ?2", mes, dia);
+    }
 }

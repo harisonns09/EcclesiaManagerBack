@@ -2,6 +2,7 @@ package org.ecclesiaManager.controller;
 
 import org.ecclesiaManager.model.dto.CheckoutRequestDTO;
 import org.ecclesiaManager.model.dto.CheckoutResponseDTO;
+import org.ecclesiaManager.model.dto.PedidoRequestDTO;
 import org.ecclesiaManager.service.IEventoService;
 import org.ecclesiaManager.service.InfinitePayService;
 import jakarta.inject.Inject;
@@ -27,6 +28,15 @@ public class CheckoutController {
             CheckoutRequestDTO data
     ) {
         CheckoutResponseDTO response = infinitePayService.createCheckoutLink(eventId, data);
+        return Response.ok(response).build();
+    }
+
+    @POST
+    @Path("/publico/produtos/{produtoId}")
+    public Response createCheckoutProduto(
+            PedidoRequestDTO data
+    ) {
+        CheckoutResponseDTO response = infinitePayService.createProdutoCheckout(data);
         return Response.ok(response).build();
     }
 }
