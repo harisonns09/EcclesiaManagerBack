@@ -66,7 +66,7 @@ public class PedidoServiceImpl implements IPedidoService {
     @Override
     @Transactional
     public void processarPagamentoWebhook(InfinitePayWebhookDTO payload) {
-        String nrTransacao = payload.orderNsu();
+        String nrTransacao = payload.transactionNsu();
         log.info("Webhook InfinitePay recebido. NSU/Transacao: {}", nrTransacao);
 
         if (nrTransacao == null) {
@@ -80,7 +80,7 @@ public class PedidoServiceImpl implements IPedidoService {
             return;
         }
 
-        if (!"PAGO".equals(pedido.getStatusPagamento())) {
+        if (pedido.getStatusPagamento() != StatusPagamento.PAGO) {
             pedido.setStatusPagamento(StatusPagamento.PAGO);
             pedido.setDataPagamento(java.time.LocalDateTime.now());
             pedido.setComprovante(payload.receiptUrl());
