@@ -48,7 +48,7 @@ public class PedidoServiceImpl implements IPedidoService {
 
     @Override
     public List<Pedido> listar(Long igrejaId) {
-        return pedidoRepository.findAllByIgrejaId(igrejaId);
+        return pedidoRepository.findAllByIgrejaId(igrejaId) ;
     }
 
     @Override
@@ -80,10 +80,12 @@ public class PedidoServiceImpl implements IPedidoService {
             return;
         }
 
-        if (pedido.getStatusPagamento() != StatusPagamento.PAGO) {
+        if (!"PAGO".equals(pedido.getStatusPagamento())) {
             pedido.setStatusPagamento(StatusPagamento.PAGO);
             pedido.setDataPagamento(java.time.LocalDateTime.now());
             pedido.setComprovante(payload.receiptUrl());
+
+            pedidoRepository.persist(pedido);
 
             log.info("Pagamento confirmado com sucesso via Webhook para transação: #{}", nrTransacao);
         } else {
