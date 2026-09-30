@@ -66,7 +66,7 @@ public class PedidoServiceImpl implements IPedidoService {
     @Override
     @Transactional
     public void processarPagamentoWebhook(InfinitePayWebhookDTO payload) {
-        String nrTransacao = payload.transactionNsu();
+        String nrTransacao = payload.orderNsu();
         log.info("Webhook InfinitePay recebido. NSU/Transacao: {}", nrTransacao);
 
         if (nrTransacao == null) {
@@ -74,9 +74,9 @@ public class PedidoServiceImpl implements IPedidoService {
             return;
         }
 
-        Pedido pedido = pedidoRepository.findByNumero_Transacao(nrTransacao);
+        Pedido pedido = pedidoRepository.findById(Long.valueOf(nrTransacao));
         if (pedido == null) {
-            log.error("Inscrição não encontrada para o número: {}", nrTransacao);
+            log.error("Pedido não encontrado para o número: {}", nrTransacao);
             return;
         }
 
