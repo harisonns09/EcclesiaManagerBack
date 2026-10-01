@@ -40,4 +40,6 @@ public class Pedido {
     private LocalDateTime dataCriacao = LocalDateTime.now();
     private LocalDateTime dataPagamento;
     private String comprovante;
+
+    private String descricao;
 }

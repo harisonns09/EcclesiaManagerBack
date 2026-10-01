@@ -36,6 +36,7 @@ public class PedidoServiceImpl implements IPedidoService {
         pedido.setStatusPagamento(StatusPagamento.PENDENTE);
         pedido.setValorTotal(dto.amount());
         pedido.setTransacaoId(dto.codigoCompra());
+        pedido.setDescricao(dto.description());
 
         // O pedido é salvo aqui, mas a transação ainda não foi commitada
         pedidoRepository.persist(pedido);
