@@ -36,6 +36,7 @@ public class PedidoServiceImpl implements IPedidoService {
         pedido.setStatusPagamento(StatusPagamento.PENDENTE);
         pedido.setValorTotal(dto.amount());
         pedido.setTransacaoId(dto.codigoCompra());
+        pedido.setDescricao(dto.description());
 
         // O pedido é salvo aqui, mas a transação ainda não foi commitada
         pedidoRepository.persist(pedido);
@@ -48,7 +49,7 @@ public class PedidoServiceImpl implements IPedidoService {
 
     @Override
     public List<Pedido> listar(Long igrejaId) {
-        return pedidoRepository.findAllByIgrejaId(igrejaId);
+        return pedidoRepository.findAllByIgrejaId(igrejaId) ;
     }
 
     @Override
@@ -80,10 +81,12 @@ public class PedidoServiceImpl implements IPedidoService {
             return;
         }
 
-        if (pedido.getStatusPagamento() != StatusPagamento.PAGO) {
+        if (!"PAGO".equals(pedido.getStatusPagamento())) {
             pedido.setStatusPagamento(StatusPagamento.PAGO);
             pedido.setDataPagamento(java.time.LocalDateTime.now());
             pedido.setComprovante(payload.receiptUrl());
+
+            pedidoRepository.persist(pedido);
 
             log.info("Pagamento confirmado com sucesso via Webhook para transação: #{}", nrTransacao);
         } else {

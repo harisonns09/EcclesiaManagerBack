@@ -34,4 +34,7 @@ public class Produto {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "igreja_id", nullable = false)
     private Igreja igreja;
+
+    @Column(name = "combo")
+    private boolean combo;
 }
